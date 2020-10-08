@@ -12,7 +12,7 @@
 #include<stdio.h>
 
 char menu(){
-    printf("1 - Ver Cardápio\n2 - Novo Pedido\n3 - Ver lista de pedidos\nDigite a escolha: ");
+    printf("1 - Ver Cardapio\n2 - Novo Pedido\n3 - Ver lista de pedidos\nDigite a escolha: ");
     return getchar();
 }
 
