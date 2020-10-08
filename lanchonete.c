@@ -8,13 +8,7 @@
         - Ver lista;
         - Controle de estoque;
 */
-/*
-cachorro quente 1,2
-bauru simples 1,3
-hamburguer 1,5
-suco 2,2
-refrigerante 1
-*/
+
 #include<stdio.h>
 
 char menu(){
