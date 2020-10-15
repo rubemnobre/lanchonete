@@ -16,7 +16,7 @@
 #define max_pedidos 50
 #define min_val_desconto 7
 #define min_qtd_desconto 3
-#define desconto 0.5
+#define desconto 0.2
 
 void clrscr(){ // Utiliza sequencia de escape para "limpar" o console (requer sistema POSIX)
     printf("\e[1;1H\e[2J");
@@ -33,6 +33,10 @@ char menu(){ // Imprime as opções do menu principal no console e retorna a esc
 void mostrar_cardapio(char *nome){ // Imprime as opções do cardápio
     int i, len;
     estoque *lista = ler_lista(nome, &len);
+    if(lista == NULL){
+        printf("Ulilize o programa estoque.exe para criar um arquivo de estoque\n");
+        return;
+    }
     printf("Codigo\t|Qtd.\t|Preco\t|Nome\n");
     for(i = 0; i < len; i++){
         if(lista[i].quantidade > 0)
@@ -161,6 +165,7 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
         if(concluir == '2'){
             printf("Aguardando senha...\n");
         }
+        clrscr();
         printf("|Qtd.\t|Unid\t|Tot.\t|Nome\n");
         i = 0;
         while(pedidos[*n_pedidos][i].qtd != -1){
@@ -186,6 +191,10 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
 }
 
 void ver_pedidos(item **pedidos, int *n_pedidos){ // Imprime os pedidos da lista
+    if(*n_pedidos == 0){
+        printf("Nenhum pedido em aberto.\n");
+        return;
+    }
     int i, j;
     for(i = 0; i < *n_pedidos; i++){
         j = 0;
@@ -198,8 +207,11 @@ void ver_pedidos(item **pedidos, int *n_pedidos){ // Imprime os pedidos da lista
 }
 
 void concluir_pedido(item **pedidos, int *n_pedidos){ // Remove o item escolhido da lista de pedidos, deslocando os posteriores para preencher
-    int i, n;
     ver_pedidos(pedidos, n_pedidos);
+    if(*n_pedidos == 0){
+        return;
+    }
+    int i, n;
     do{
         printf("Digite o numero do pedido: ");
         scanf("%d", &n);
