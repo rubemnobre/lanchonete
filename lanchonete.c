@@ -52,16 +52,13 @@ float calcular_preco(item *lista){ // Retorna o preço de uma lista de itens (um
     return total;
 }
 
-void atualizar_estoque(char *nome, item *pedido){ // Diminui a quantidade no estoque dos itens do pedido
-    int i = 0, j, len;
+void atualizar_estoque(char *nome, item pedido, int mult){ // Atualiza a quantidade no estoque do item
+    int j, len;
     estoque *lista_estoque = ler_lista(nome, &len);
-    while(pedido[i].qtd != -1){
-        for(j = 0; j < len; j++){
-            if(lista_estoque[j].codigo == pedido[i].tipo.codigo){
-                lista_estoque[j].quantidade -= pedido[i].qtd;
-            }
+    for(j = 0; j < len; j++){
+        if(lista_estoque[j].codigo == pedido.tipo.codigo){
+            lista_estoque[j].quantidade += mult*pedido.qtd;
         }
-        i++;
     }
     escrever_lista(nome, lista_estoque, len);
     free(lista_estoque);
@@ -107,6 +104,7 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
         printf("Obs: ");
         fflush(stdin);
         scanf("%99[^\n]s", &itens[i].obs);
+        atualizar_estoque(nome, itens[i], -1);
         clrscr();
     }
 
@@ -157,10 +155,12 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
             i++;
         }
         printf("\nSenha: %d\n", *n_pedidos);
-        atualizar_estoque(nome, pedidos[*n_pedidos]);
         printf("Pedido finalizado!\n");
         (*n_pedidos) += 1;
     }else{
+        for(j = 0; j < i; j++){
+            atualizar_estoque(nome, itens[j], +1);
+        }
         printf("Pedido cancelado!\n");
     }
 }
