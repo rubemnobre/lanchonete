@@ -19,7 +19,7 @@ void clrscr(){ // Utiliza sequencia de escape para "limpar" o console (requer si
     printf("\e[1;1H\e[2J");
 }
 
-char menu(){ // Imprime as opções do menu principal no console e recebe a escolha do usuário
+char menu(){ // Imprime as opções do menu principal no console e retorna a escolha do usuário
     char opcao;
     printf("1 - Ver Cardapio\n2 - Novo Pedido\n3 - Ver lista de pedidos\n4 - Sair\nDigite a escolha: ");
     scanf(" %c", &opcao);
@@ -36,13 +36,13 @@ void mostrar_cardapio(char *nome){ // Imprime as opções do cardápio
     }
 }
 
-typedef struct{
+typedef struct{ // Tipo de struct para conter um item em um pedido
     estoque tipo;
     int qtd;
     char obs[100];
 }item;
 
-float calcular_preco(item *lista){
+float calcular_preco(item *lista){ // Retorna o preço de uma lista de itens (um pedido)
     int i = 0;
     float total = 0;
     while(lista[i].qtd != -1){
@@ -52,7 +52,7 @@ float calcular_preco(item *lista){
     return total;
 }
 
-void atualizar_estoque(char *nome, item *pedido){
+void atualizar_estoque(char *nome, item *pedido){ // Diminui a quantidade no estoque dos itens do pedido
     int i = 0, j, len;
     estoque *lista_estoque = ler_lista(nome, &len);
     while(pedido[i].qtd != -1){
@@ -67,9 +67,11 @@ void atualizar_estoque(char *nome, item *pedido){
     free(lista_estoque);
 }
 
-void novo_pedido(char *nome, item **pedidos, int *n_pedidos){
+void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento interativo que adiciona novo pedido a lista
     item itens[max_itens];
     int i, j;
+
+    // Receber item a item do pedido
     for(i = 0; i < max_itens; i++){
         mostrar_cardapio(nome);
         printf("\n0 - Finalizar\nEscolha o item: ");
@@ -79,6 +81,8 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){
             clrscr();
             break;
         }
+
+        // Procura codigo digitado dentre os existentes no estoque
         int len, found = 0;
         estoque *lista = ler_lista(nome, &len);
         for(j = 0; j < len; j++){
@@ -87,19 +91,26 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){
                 found = 1;
             }
         }
+        free(lista);
         if(found == 0){
             printf("Codigo nao encontrado\n");
             break;
         }
+
+        // Recebe a quantidade solicitada, repete se a quantidade for inválida
         do{
             printf("Digite a quantidade (maximo %d): ", itens[i].tipo.quantidade);
             scanf("%d", &itens[i].qtd);
         }while(itens[i].qtd > itens[i].tipo.quantidade || itens[i].qtd < 0);
+
+        // Recebe observação do item
         printf("Obs: ");
         fflush(stdin);
         scanf("%99[^\n]s", &itens[i].obs);
         clrscr();
     }
+
+    // Imprimir resumo do pedido
     pedidos[*n_pedidos] = malloc(sizeof(item)*(i+1));
     printf("Resumo do pedido \n");
     for(j = 0; j < i; j++){
@@ -109,6 +120,8 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){
     pedidos[*n_pedidos][j].qtd = -1;
     float valor_total = calcular_preco(pedidos[*n_pedidos]);
     printf("Valor total: RS%.2f\n", valor_total);
+
+    // Confirmação e conclusão do pedido
     char concluir;
     printf("Confirmar pedido? (s/n) ");
     fflush(stdin);
@@ -152,7 +165,7 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){
     }
 }
 
-void ver_pedidos(item **pedidos, int *n_pedidos){
+void ver_pedidos(item **pedidos, int *n_pedidos){ // Imprime os pedidos da lista
     int i, j;
     for(i = 0; i < *n_pedidos; i++){
         j = 0;
@@ -164,13 +177,19 @@ void ver_pedidos(item **pedidos, int *n_pedidos){
     }
 }
 
-int main(int argc, char **argv){
+int main(int argc, char **argv){ // Controla o fluxo principal do programa
     if(argc != 2){
         printf("Uso: \nlanchonete.exe nome_do_arquivo");
         return 1;
     }
+
+    // Inicializa a lista de pedidos com ponteiros nulos (para liberar a memória com segurança no final)
     int n_pedidos = 0, i;
     item *pedidos[max_pedidos];
+    for(i = 0; i < max_pedidos; i++){
+        pedidos[i] = NULL;
+    }
+
     while(1){
         switch(menu()){
             case '1':
@@ -183,7 +202,7 @@ int main(int argc, char **argv){
                 ver_pedidos(pedidos, &n_pedidos);
                 break;
             case '4':
-                for(i = 0; i < max_pedidos; i++){
+                for(i = 0; i < max_pedidos; i++){ // Coleta de memória
                     free(pedidos[i]);
                 }
                 return 0;
