@@ -13,7 +13,7 @@ estoque *ler_lista(char* nome, int *len){
     estoque *lista;
     FILE *arquivo_estoque = fopen(nome, "rb");
     if(arquivo_estoque == NULL){
-        printf("tentativa de abrir o arquivo %s falhou\n", nome);
+        printf("Tentativa de abrir o arquivo %s falhou\n", nome);
         return NULL;
     }
     fscanf(arquivo_estoque, "%d\n", len);

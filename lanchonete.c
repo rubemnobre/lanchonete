@@ -41,6 +41,31 @@ typedef struct{
     char obs[100];
 }item;
 
+float calcular_preco(item *lista){
+    int i = 0;
+    float total = 0;
+    while(lista[i].qtd != -1){
+        total += lista[i].tipo.preco * lista[i].qtd;
+        i++;
+    }
+    return total;
+}
+
+void atualizar_estoque(char *nome, item *pedido){
+    int i = 0, j, len;
+    estoque *lista_estoque = ler_lista(nome, &len);
+    while(pedido[i].qtd != -1){
+        for(j = 0; j < len; j++){
+            if(lista_estoque[j].codigo == pedido[i].tipo.codigo){
+                lista_estoque[j].quantidade -= pedido[i].qtd;
+            }
+        }
+        i++;
+    }
+    escrever_lista(nome, lista_estoque, len);
+    free(lista_estoque);
+}
+
 void novo_pedido(char *nome, item **pedidos, int *n_pedidos){
     item itens[max_itens];
     int i, j;
@@ -81,8 +106,49 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){
         printf("%dx %s\n", pedidos[*n_pedidos][j].qtd, pedidos[*n_pedidos][j].tipo.nome);
     }
     pedidos[*n_pedidos][j].qtd = -1;
-    (*n_pedidos) += 1;
-    printf("Pedido finalizado!\n");
+    float valor_total = calcular_preco(pedidos[*n_pedidos]);
+    printf("Valor total: RS%.2f\n", valor_total);
+    char concluir;
+    printf("Confirmar pedido? (s/n) ");
+    fflush(stdin);
+    scanf("%c", &concluir);
+    if(concluir == 's'){
+        printf("Opcoes de pagamento:\n\t1 - Dinheiro\n\t2 - Cartao\n");
+        do{
+            printf("Escolha: ");
+            fflush(stdin);
+            scanf("%c", &concluir);
+        }while(concluir != '1' && concluir != '2');
+        if(concluir == '1'){
+            printf("Quanto foi pago: ");
+            float pago = 0;
+            do{
+                scanf("%f", &pago);
+                printf("Troco: RS%.2f\n", pago - valor_total);
+            }while(pago <= valor_total);
+            printf("Doar troco? (s/n) ");
+            fflush(stdin);
+            scanf("%c", &concluir);
+            printf("Para viagem? (s/n) ");
+            fflush(stdin);
+            scanf("%c", &concluir);
+        }
+        if(concluir == '2'){
+            printf("Aguardando senha...\n");
+        }
+        printf("|Qtd.\t|Unid\t|Tot.\t|Nome\n");
+        i = 0;
+        while(pedidos[*n_pedidos][i].qtd != -1){
+            printf("|%d\t|%.2f\t|%.2f\t|%s\n", pedidos[*n_pedidos][i].qtd, pedidos[*n_pedidos][i].tipo.preco, pedidos[*n_pedidos][i].tipo.preco * pedidos[*n_pedidos][i].qtd, pedidos[*n_pedidos][i].tipo.nome);
+            i++;
+        }
+        printf("\nSenha: %d\n", *n_pedidos);
+        atualizar_estoque(nome, pedidos[*n_pedidos]);
+        printf("Pedido finalizado!\n");
+        (*n_pedidos) += 1;
+    }else{
+        printf("Pedido cancelado!\n");
+    }
 }
 
 void ver_pedidos(item **pedidos, int *n_pedidos){
