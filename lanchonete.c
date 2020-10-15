@@ -116,6 +116,11 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
         clrscr();
     }
 
+    // Finaliza a função se nenhum item foi adicionado
+    if(i == 0){
+        return;
+    }
+
     // Imprimir resumo do pedido
     pedidos[*n_pedidos] = malloc(sizeof(item)*(i+1));
     printf("Resumo do pedido \n");
@@ -140,12 +145,12 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
             scanf("%c", &concluir);
         }while(concluir != '1' && concluir != '2');
         if(concluir == '1'){
-            printf("Quanto foi pago: ");
             float pago = 0;
             do{
+                printf("Quanto foi pago: ");
                 scanf("%f", &pago);
-                printf("Troco: RS%.2f\n", pago - valor_total);
             }while(pago <= valor_total);
+            printf("Troco: RS%.2f\n", pago - valor_total);
             printf("Doar troco? (s/n) ");
             fflush(stdin);
             scanf("%c", &concluir);
