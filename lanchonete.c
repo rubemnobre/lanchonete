@@ -14,6 +14,9 @@
 #include"estoque.h"
 #define max_itens 10
 #define max_pedidos 50
+#define min_val_desconto 7
+#define min_qtd_desconto 3
+#define desconto 0.5
 
 void clrscr(){ // Utiliza sequencia de escape para "limpar" o console (requer sistema POSIX)
     printf("\e[1;1H\e[2J");
@@ -21,7 +24,7 @@ void clrscr(){ // Utiliza sequencia de escape para "limpar" o console (requer si
 
 char menu(){ // Imprime as opções do menu principal no console e retorna a escolha do usuário
     char opcao;
-    printf("1 - Ver Cardapio\n2 - Novo Pedido\n3 - Ver lista de pedidos\n4 - Sair\nDigite a escolha: ");
+    printf("1 - Ver Cardapio\n2 - Novo Pedido\n3 - Ver lista de pedidos\n4 - Concluir pedido\n5 - Sair\nDigite a escolha: ");
     scanf(" %c", &opcao);
     clrscr();
     return opcao;
@@ -32,7 +35,8 @@ void mostrar_cardapio(char *nome){ // Imprime as opções do cardápio
     estoque *lista = ler_lista(nome, &len);
     printf("Codigo\t|Qtd.\t|Preco\t|Nome\n");
     for(i = 0; i < len; i++){
-        printf("%d\t|%d\t|%.2f\t|%s\n", lista[i].codigo, lista[i].quantidade, lista[i].preco, lista[i].nome);
+        if(lista[i].quantidade > 0)
+            printf("%d\t|%d\t|%.2f\t|%s\n", lista[i].codigo, lista[i].quantidade, lista[i].preco, lista[i].nome);
     }
 }
 
@@ -46,7 +50,11 @@ float calcular_preco(item *lista){ // Retorna o preço de uma lista de itens (um
     int i = 0;
     float total = 0;
     while(lista[i].qtd != -1){
-        total += lista[i].tipo.preco * lista[i].qtd;
+        if(lista[i].tipo.preco >= min_val_desconto && lista[i].qtd >= min_qtd_desconto){
+            total += lista[i].tipo.preco * lista[i].qtd * (1-desconto);
+        }else{
+            total += lista[i].tipo.preco * lista[i].qtd;
+        }
         i++;
     }
     return total;
@@ -151,7 +159,13 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
         printf("|Qtd.\t|Unid\t|Tot.\t|Nome\n");
         i = 0;
         while(pedidos[*n_pedidos][i].qtd != -1){
-            printf("|%d\t|%.2f\t|%.2f\t|%s\n", pedidos[*n_pedidos][i].qtd, pedidos[*n_pedidos][i].tipo.preco, pedidos[*n_pedidos][i].tipo.preco * pedidos[*n_pedidos][i].qtd, pedidos[*n_pedidos][i].tipo.nome);
+            float valor;
+            if(pedidos[*n_pedidos][i].tipo.preco >= min_val_desconto && pedidos[*n_pedidos][i].qtd >= min_qtd_desconto){
+                valor = pedidos[*n_pedidos][i].tipo.preco * pedidos[*n_pedidos][i].qtd * (1-desconto);
+            }else{
+                valor = pedidos[*n_pedidos][i].tipo.preco * pedidos[*n_pedidos][i].qtd;
+            }
+            printf("|%d\t|%.2f\t|%.2f\t|%s\n", pedidos[*n_pedidos][i].qtd, pedidos[*n_pedidos][i].tipo.preco, valor, pedidos[*n_pedidos][i].tipo.nome);
             i++;
         }
         printf("Valor total: RS%.2f\n", valor_total);
@@ -178,6 +192,22 @@ void ver_pedidos(item **pedidos, int *n_pedidos){ // Imprime os pedidos da lista
     }
 }
 
+void concluir_pedido(item **pedidos, int *n_pedidos){ // Remove o item escolhido da lista de pedidos, deslocando os posteriores para preencher
+    int i, n;
+    ver_pedidos(pedidos, n_pedidos);
+    do{
+        printf("Digite o numero do pedido: ");
+        scanf("%d", &n);
+    }while(n >= *n_pedidos || n < 0);
+
+    for(i = n; i < *n_pedidos; i++){
+        pedidos[i] = pedidos[i+1];
+    }
+    pedidos[*n_pedidos] = NULL;
+    (*n_pedidos) -= 1;
+    clrscr();
+}
+
 int main(int argc, char **argv){ // Controla o fluxo principal do programa
     if(argc != 2){
         printf("Uso: \nlanchonete.exe nome_do_arquivo");
@@ -190,7 +220,7 @@ int main(int argc, char **argv){ // Controla o fluxo principal do programa
     for(i = 0; i < max_pedidos; i++){
         pedidos[i] = NULL;
     }
-    printf("teste\n");
+    
     while(1){
         switch(menu()){
             case '1':
@@ -203,6 +233,9 @@ int main(int argc, char **argv){ // Controla o fluxo principal do programa
                 ver_pedidos(pedidos, &n_pedidos);
                 break;
             case '4':
+                concluir_pedido(pedidos, &n_pedidos);
+                break;
+            case '5':
                 for(i = 0; i < max_pedidos; i++){ // Coleta de memória
                     free(pedidos[i]);
                 }
