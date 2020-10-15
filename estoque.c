@@ -13,7 +13,7 @@ char menu(){ // Imprime as opções do menu principal no console e recebe a esco
     return opcao;
 }
 
-int ver_estoque(char *nome){
+int ver_estoque(char *nome){ // Imprime todos os itens do estoque e retorna a quantidade
     int i, len;
     estoque *lista = ler_lista(nome, &len);
     printf("Indice\t|Codigo\t|Qtd.\t|Preco\t|Nome\n");
@@ -23,7 +23,7 @@ int ver_estoque(char *nome){
     return len;
 }
 
-void ler_item(estoque *item){
+void ler_item(estoque *item){ // Recebe os dados do usuário e preenche o item apontado no argumento
     printf("Digite o codigo: ");
     scanf("%d", &(item->codigo));
     printf("Digite o nome: ");
@@ -35,7 +35,7 @@ void ler_item(estoque *item){
     scanf("%f", &(item->preco));
 }
 
-int modificar_item(char *nome){
+int modificar_item(char *nome){ // Seleciona um item do estoque e atualiza sua quantidade a partir de entrada do usuario
     int i, len;
     estoque *lista = ler_lista(nome, &len);
     if(lista == NULL){
@@ -53,7 +53,7 @@ int modificar_item(char *nome){
     return len;
 }
 
-void adicionar_item(char *nome){
+void adicionar_item(char *nome){ // Adiciona item à lista do estoque
     int i, len;
     estoque *lista = ler_lista(nome, &len);
     if(lista == NULL){
@@ -69,7 +69,7 @@ void adicionar_item(char *nome){
     escrever_lista(nome, nova_lista, len+1);
 }
 
-int main(int argc, char **argv){
+int main(int argc, char **argv){ // Controla o fluxo principal do programa
     if(argc != 2){
         printf("Uso: \n\testoque.exe nome_do_arquivo");
         return 1;
