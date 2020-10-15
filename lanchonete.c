@@ -154,7 +154,8 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
             printf("|%d\t|%.2f\t|%.2f\t|%s\n", pedidos[*n_pedidos][i].qtd, pedidos[*n_pedidos][i].tipo.preco, pedidos[*n_pedidos][i].tipo.preco * pedidos[*n_pedidos][i].qtd, pedidos[*n_pedidos][i].tipo.nome);
             i++;
         }
-        printf("\nSenha: %d\n", *n_pedidos);
+        printf("Valor total: RS%.2f\n", valor_total);
+        printf("Senha: %d\n", *n_pedidos);
         printf("Pedido finalizado!\n");
         (*n_pedidos) += 1;
     }else{
