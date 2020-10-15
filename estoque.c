@@ -45,7 +45,10 @@ int modificar_item(char *nome){
     len = ver_estoque(nome);
     printf("Escolher indice: ");
     scanf("%d", &i);
-    ler_item(&lista[i]);
+    printf("Digite a nova quantidade: ");
+    int n;
+    scanf("%d", &n);
+    lista[i].quantidade = n;
     escrever_lista(nome, lista, len);
     return len;
 }
