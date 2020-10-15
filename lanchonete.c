@@ -13,6 +13,7 @@
 #include<string.h>
 #include"estoque.h"
 #define max_itens 10
+#define max_pedidos 50
 
 void clrscr(){ // Utiliza sequencia de escape para "limpar" o console (requer sistema POSIX)
     printf("\e[1;1H\e[2J");
@@ -20,7 +21,7 @@ void clrscr(){ // Utiliza sequencia de escape para "limpar" o console (requer si
 
 char menu(){ // Imprime as opções do menu principal no console e recebe a escolha do usuário
     char opcao;
-    printf("1 - Ver Cardapio\n2 - Novo Pedido\n3 - Ver lista de pedidos\nDigite a escolha: ");
+    printf("1 - Ver Cardapio\n2 - Novo Pedido\n3 - Ver lista de pedidos\n4 - Sair\nDigite a escolha: ");
     scanf(" %c", &opcao);
     clrscr();
     return opcao;
@@ -168,8 +169,8 @@ int main(int argc, char **argv){
         printf("Uso: \nlanchonete.exe nome_do_arquivo");
         return 1;
     }
-    int n_pedidos = 0;
-    item *pedidos[50];
+    int n_pedidos = 0, i;
+    item *pedidos[max_pedidos];
     while(1){
         switch(menu()){
             case '1':
@@ -181,6 +182,11 @@ int main(int argc, char **argv){
             case '3':
                 ver_pedidos(pedidos, &n_pedidos);
                 break;
+            case '4':
+                for(i = 0; i < max_pedidos; i++){
+                    free(pedidos[i]);
+                }
+                return 0;
         }
     }
 }
