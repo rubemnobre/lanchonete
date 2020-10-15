@@ -14,6 +14,7 @@ estoque *ler_lista(char* nome, int *len){
     FILE *arquivo_estoque = fopen(nome, "rb");
     if(arquivo_estoque == NULL){
         printf("Tentativa de abrir o arquivo %s falhou\n", nome);
+        *len = 0;
         return NULL;
     }
     fscanf(arquivo_estoque, "%d\n", len);

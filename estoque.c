@@ -16,6 +16,9 @@ char menu(){ // Imprime as opções do menu principal no console e recebe a esco
 int ver_estoque(char *nome){ // Imprime todos os itens do estoque e retorna a quantidade
     int i, len;
     estoque *lista = ler_lista(nome, &len);
+    if(lista == NULL){
+        return 0;
+    }
     printf("Indice\t|Codigo\t|Qtd.\t|Preco\t|Nome\n");
     for(i = 0; i < len; i++){
         printf("%d\t|%d\t|%d\t|%.2f\t|%s\n", i, lista[i].codigo, lista[i].quantidade, lista[i].preco, lista[i].nome);
