@@ -190,6 +190,7 @@ int main(int argc, char **argv){ // Controla o fluxo principal do programa
     for(i = 0; i < max_pedidos; i++){
         pedidos[i] = NULL;
     }
+    printf("Teste");
 
     while(1){
         switch(menu()){
