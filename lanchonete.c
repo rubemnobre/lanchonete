@@ -18,13 +18,15 @@
 #define min_qtd_desconto 3
 #define desconto 0.2
 
+int posix = 0;
+
 void limpar_console(){ // Utiliza sequencia de escape para "limpar" o console (requer sistema POSIX)
-    printf("\e[1;1H\e[2J");
+    if(posix) printf("\e[1;1H\e[2J");
 }
 
 void cor_console(int cod){
     int r = cod/0xFFFF, g = (cod%0x010000)/0xFF, b = cod % 0x0100;
-    printf("\e[38;2;%d;%d;%dm", r, g, b);
+    if(posix) printf("\e[38;2;%d;%d;%dm", r, g, b);
 }
 
 char menu(){ // Imprime as opções do menu principal no console e retorna a escolha do usuário
@@ -230,14 +232,37 @@ void concluir_pedido(item **pedidos, int *n_pedidos){ // Remove o item escolhido
     limpar_console();
 }
 
+const char help[] = "Opcoes:\n\t-a <arquivo> : Utilizar arquivo de estoque\n\t-p : Habilitar visuais do console (para terminais compatíveis com POSIX, como os do Linux e Mac e o Powershell no Windows)\n\t-h : ver opcoes (esta tela)\n";
+
 int main(int argc, char **argv){ // Controla o fluxo principal do programa
     char *nome = "estoque.bin";
-    if(argc != 2){
-        printf("Utilizando o arquivo '%s' por padrao\nPara utilizar um arquivo diferente, use o nome como argumento.\n", nome);
+    if(argc == 1){
+        printf("Utilizando o arquivo '%s' para o estoque (utilize -h para ver opcoes especiais)\n", nome);
     }else{
-        nome = argv[1];
+        int i;
+        for(i = 1; i < argc;i++){
+            if(argv[i][0] == '-'){
+                switch(argv[i][1]){
+                    case 'p':
+                        posix = 1;
+                        break;
+                    case 'a':
+                        if(argc > i){
+                            if(argv[i+1][0] != '-'){
+                                nome = argv[i+1];
+                                break;
+                            }
+                        }
+                        printf("Argumento invalido\n%s", help);
+                        return 1;
+                    case 'h':
+                        printf("%s", help);
+                        return 0;
+                }
+            }
+        }
     }
-    cor_console(0xffff00);
+    
     // Inicializa a lista de pedidos com ponteiros nulos (para liberar a memória com segurança no final)
     int n_pedidos = 0, i;
     item *pedidos[max_pedidos];
