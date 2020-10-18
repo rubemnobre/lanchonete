@@ -17,6 +17,7 @@ int ver_estoque(char *nome){ // Imprime todos os itens do estoque e retorna a qu
     int i, len;
     estoque *lista = ler_lista(nome, &len);
     if(lista == NULL){
+        printf("Estoque sem nenhum item, utilize a opcao 3 para adicionar algo.\n");
         return 0;
     }
     printf("Indice\t|Codigo\t|Qtd.\t|Preco\t|Nome\n");
@@ -61,6 +62,7 @@ void adicionar_item(char *nome){ // Adiciona item à lista do estoque
     estoque *lista = ler_lista(nome, &len);
     if(lista == NULL){
         len = 0;
+        printf("Criando o arquivo %s\n", nome);
     }
     estoque nova_lista[len+1];
     estoque novo;
@@ -77,19 +79,19 @@ int main(int argc, char **argv){ // Controla o fluxo principal do programa
     if(argc != 2){
         printf("Utilizando o arquivo '%s' por padrao\nPara utilizar um arquivo diferente, use o nome como argumento.\n", nome);
     }else{
-        nome = argv[1];
+        nome = &argv[1][0];
     }
-    
+
     while(1){
         switch(menu()){
             case '1':
-                modificar_item(argv[1]);
+                modificar_item(nome);
                 break;
             case '2':
-                ver_estoque(argv[1]);
+                ver_estoque(nome);
                 break;
             case '3':
-                adicionar_item(argv[1]);
+                adicionar_item(nome);
                 break;
             case '0':
                 return 0;

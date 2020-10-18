@@ -41,7 +41,9 @@ void mostrar_cardapio(char *nome){ // Imprime as opções do cardápio
     int i, len;
     estoque *lista = ler_lista(nome, &len);
     if(lista == NULL){
-        printf("Ulilize o programa estoque.exe para criar um arquivo de estoque\n");
+        cor_console(0xff0000);
+        printf("Ulilize o programa estoque.exe para criar um arquivo de estoque (adicione algo ao estoque)\n");
+        cor_console(0xffffff);
         return;
     }
     printf("Codigo\t|Qtd.\t|Preco\t|Nome\n");
@@ -240,7 +242,7 @@ int main(int argc, char **argv){ // Controla o fluxo principal do programa
         printf("Utilizando o arquivo '%s' para o estoque (utilize -h para ver opcoes especiais)\n", nome);
     }else{
         int i;
-        for(i = 1; i < argc;i++){
+        for(i = 1; i < argc; i++){
             if(argv[i][0] == '-'){
                 switch(argv[i][1]){
                     case 'p':
@@ -249,7 +251,8 @@ int main(int argc, char **argv){ // Controla o fluxo principal do programa
                     case 'a':
                         if(argc > i){
                             if(argv[i+1][0] != '-'){
-                                nome = argv[i+1];
+                                nome = &argv[i+1][0];
+                                i++;
                                 break;
                             }
                         }
@@ -258,11 +261,13 @@ int main(int argc, char **argv){ // Controla o fluxo principal do programa
                     case 'h':
                         printf("%s", help);
                         return 0;
+                }else{
+                    printf("Argumento invalido\n%s", help);
                 }
             }
         }
     }
-    
+
     // Inicializa a lista de pedidos com ponteiros nulos (para liberar a memória com segurança no final)
     int n_pedidos = 0, i;
     item *pedidos[max_pedidos];
