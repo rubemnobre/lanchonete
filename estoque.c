@@ -73,10 +73,13 @@ void adicionar_item(char *nome){ // Adiciona item à lista do estoque
 }
 
 int main(int argc, char **argv){ // Controla o fluxo principal do programa
+    char *nome = "estoque.bin";
     if(argc != 2){
-        printf("Uso: \n\testoque.exe nome_do_arquivo");
-        return 1;
+        printf("Utilizando o arquivo '%s' por padrao\nPara utilizar um arquivo diferente, use o nome como argumento.\n", nome);
+    }else{
+        nome = argv[1];
     }
+    
     while(1){
         switch(menu()){
             case '1':

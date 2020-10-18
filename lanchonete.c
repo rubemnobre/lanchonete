@@ -18,15 +18,20 @@
 #define min_qtd_desconto 3
 #define desconto 0.2
 
-void clrscr(){ // Utiliza sequencia de escape para "limpar" o console (requer sistema POSIX)
+void limpar_console(){ // Utiliza sequencia de escape para "limpar" o console (requer sistema POSIX)
     printf("\e[1;1H\e[2J");
+}
+
+void cor_console(int cod){
+    int r = cod/0xFFFF, g = (cod%0x010000)/0xFF, b = cod % 0x0100;
+    printf("\e[38;2;%d;%d;%dm", r, g, b);
 }
 
 char menu(){ // Imprime as opções do menu principal no console e retorna a escolha do usuário
     char opcao;
     printf("1 - Ver Cardapio\n2 - Novo Pedido\n3 - Ver lista de pedidos\n4 - Concluir pedido\n5 - Sair\nDigite a escolha: ");
     scanf(" %c", &opcao);
-    clrscr();
+    limpar_console();
     return opcao;
 }
 
@@ -87,7 +92,7 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
         int codigo;
         scanf("%d", &codigo);
         if(codigo == 0){
-            clrscr();
+            limpar_console();
             break;
         }
 
@@ -117,7 +122,7 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
         fflush(stdin);
         scanf("%99[^\n]s", &itens[i].obs);
         atualizar_estoque(nome, itens[i], -1);
-        clrscr();
+        limpar_console();
     }
 
     // Finaliza a função se nenhum item foi adicionado
@@ -165,7 +170,7 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
         if(concluir == '2'){
             printf("Aguardando senha...\n");
         }
-        clrscr();
+        limpar_console();
         printf("|Qtd.\t|Unid\t|Tot.\t|Nome\n");
         i = 0;
         while(pedidos[*n_pedidos][i].qtd != -1){
@@ -222,15 +227,17 @@ void concluir_pedido(item **pedidos, int *n_pedidos){ // Remove o item escolhido
     }
     pedidos[*n_pedidos] = NULL;
     (*n_pedidos) -= 1;
-    clrscr();
+    limpar_console();
 }
 
 int main(int argc, char **argv){ // Controla o fluxo principal do programa
+    char *nome = "estoque.bin";
     if(argc != 2){
-        printf("Uso: \nlanchonete.exe nome_do_arquivo");
-        return 1;
+        printf("Utilizando o arquivo '%s' por padrao\nPara utilizar um arquivo diferente, use o nome como argumento.\n", nome);
+    }else{
+        nome = argv[1];
     }
-
+    cor_console(0xffff00);
     // Inicializa a lista de pedidos com ponteiros nulos (para liberar a memória com segurança no final)
     int n_pedidos = 0, i;
     item *pedidos[max_pedidos];
@@ -241,10 +248,10 @@ int main(int argc, char **argv){ // Controla o fluxo principal do programa
     while(1){
         switch(menu()){
             case '1':
-                mostrar_cardapio(argv[1]);
+                mostrar_cardapio(nome);
                 break;
             case '2':
-                novo_pedido(argv[1], pedidos, &n_pedidos);
+                novo_pedido(nome, pedidos, &n_pedidos);
                 break;
             case '3':
                 ver_pedidos(pedidos, &n_pedidos);
