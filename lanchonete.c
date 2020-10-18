@@ -261,8 +261,9 @@ int main(int argc, char **argv){ // Controla o fluxo principal do programa
                     case 'h':
                         printf("%s", help);
                         return 0;
-                }else{
-                    printf("Argumento invalido\n%s", help);
+                    default:
+                        printf("Argumento invalido\n%s", help);
+                        return 1;
                 }
             }
         }
