@@ -111,7 +111,9 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
         }
         free(lista);
         if(found == 0){
+            cor_console(0xff0000);
             printf("Codigo nao encontrado\n");
+            cor_console(0xffffff);
             break;
         }
 
@@ -143,7 +145,9 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
     }
     pedidos[*n_pedidos][j].qtd = -1;
     float valor_total = calcular_preco(pedidos[*n_pedidos]);
+    cor_console(0xffff00);
     printf("Valor total: RS%.2f\n", valor_total);
+    cor_console(0xffffff);
 
     // Confirmação e conclusão do pedido
     char concluir;
@@ -209,7 +213,7 @@ void ver_pedidos(item **pedidos, int *n_pedidos){ // Imprime os pedidos da lista
         j = 0;
         printf("Pedido %d\n", i);
         while(pedidos[i][j].qtd != -1){
-            printf("  %dx %s\n", pedidos[i][j].qtd, pedidos[i][j].tipo.nome);
+            printf("  %dx %s (%s)\n", pedidos[i][j].qtd, pedidos[i][j].tipo.nome, pedidos[i][j].obs);
             j++;
         }
     }
@@ -238,9 +242,8 @@ const char help[] = "Opcoes:\n\t-a <arquivo> : Utilizar arquivo de estoque\n\t-p
 
 int main(int argc, char **argv){ // Controla o fluxo principal do programa
     char *nome = "estoque.bin";
-    if(argc == 1){
-        printf("Utilizando o arquivo '%s' para o estoque (utilize -h para ver opcoes especiais)\n", nome);
-    }else{
+    int novo_nome = 0;
+    if(argc != 1){
         int i;
         for(i = 1; i < argc; i++){
             if(argv[i][0] == '-'){
@@ -253,6 +256,7 @@ int main(int argc, char **argv){ // Controla o fluxo principal do programa
                             if(argv[i+1][0] != '-'){
                                 nome = &argv[i+1][0];
                                 i++;
+                                novo_nome = 1;
                                 break;
                             }
                         }
@@ -267,6 +271,12 @@ int main(int argc, char **argv){ // Controla o fluxo principal do programa
                 }
             }
         }
+    }
+
+    if(!novo_nome){
+        cor_console(0xffff00);
+        printf("Utilizando o arquivo '%s' para o estoque (utilize -h para ver opcoes especiais)\n", nome);
+        cor_console(0xffffff);
     }
 
     // Inicializa a lista de pedidos com ponteiros nulos (para liberar a memória com segurança no final)
