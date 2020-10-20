@@ -192,7 +192,7 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
             i++;
         }
         printf("Valor total: RS%.2f\n", valor_total);
-        printf("Senha: %d\n", *n_pedidos);
+        printf("Senha do pedido: %d\n", *n_pedidos);
         printf("Pedido finalizado!\n");
         (*n_pedidos) += 1;
     }else{
