@@ -4,6 +4,13 @@
 
 int posix = 0;
 
+void limpar_stdin(){
+    int c;
+    do{
+        c = getchar();
+    }while (c != '\n' && c != EOF);
+}
+
 void limpar_console(){ // Utiliza sequencia de escape para "limpar" o console (requer sistema POSIX)
     if(posix) printf("\e[1;1H\e[2J");
 }
@@ -44,7 +51,7 @@ void ler_item(estoque *item){ // Recebe os dados do usuário e preenche o item a
     printf("Digite o codigo: ");
     scanf("%d", &(item->codigo));
     printf("Digite o nome: ");
-    fflush(stdin);
+    limpar_stdin();
     scanf("%49[^\n]", &(item->nome));
     printf("Digite a quantidade: ");
     scanf("%d", &(item->quantidade));

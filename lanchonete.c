@@ -1,12 +1,6 @@
 /*
     Projeto de PCE
     Lanchonete
-    Features:
-        - Menu principal;
-        - Cardápio;
-        - Fazer pedido;
-        - Ver lista;
-        - Controle de estoque;
 */
 
 #include<stdio.h>
@@ -19,6 +13,13 @@
 #define desconto 0.2
 
 int posix = 0;
+
+void limpar_stdin(){ // Equivalente ao fflush(stdin)
+    int c;
+    do{
+        c = getchar();
+    }while (c != '\n' && c != EOF);
+}
 
 void limpar_console(){ // Utiliza sequencia de escape para "limpar" o console (requer sistema POSIX)
     if(posix) printf("\e[1;1H\e[2J");
@@ -139,7 +140,7 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
 
         // Recebe observação do item
         printf("Obs: ");
-        fflush(stdin);
+        limpar_stdin();
         itens[i].obs[0] = '~';
         scanf("%99[^\n]s", &itens[i].obs);
         atualizar_estoque(nome, itens[i], -1);
@@ -167,13 +168,13 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
     // Confirmação e conclusão do pedido
     char concluir;
     printf("Confirmar pedido? (s/n) ");
-    fflush(stdin);
+    limpar_stdin();
     scanf("%c", &concluir);
     if(concluir == 's'){
         printf("Opcoes de pagamento:\n\t1 - Dinheiro\n\t2 - Cartao\n");
         do{
             printf("Escolha: ");
-            fflush(stdin);
+            limpar_stdin();
             scanf("%c", &concluir);
         }while(concluir != '1' && concluir != '2');
         if(concluir == '1'){
@@ -184,14 +185,14 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
             }while(pago <= valor_total);
             printf("Troco: RS%.2f\n", pago - valor_total);
             printf("Doar troco? (s/n) ");
-            fflush(stdin);
+            limpar_stdin();
             scanf("%c", &concluir);
         }
         if(concluir == '2'){
             printf("Aguardando senha...\n");
         }
         printf("Para viagem? (s/n) ");
-        fflush(stdin);
+        limpar_stdin();
         scanf("%c", &concluir);
         limpar_console();
         printf("|Qtd.\t|Unid\t|Tot.\t|Nome\n");
