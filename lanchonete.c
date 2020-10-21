@@ -25,7 +25,12 @@ void limpar_console(){ // Utiliza sequencia de escape para "limpar" o console (r
 }
 
 void cor_console(int cod){
-    int r = cod/0xFFFF, g = (cod%0x010000)/0xFF, b = cod % 0x0100;
+    void cor_console(int cod){
+    int r, g, b;
+    r = (cod >> 16) & 0xFF;  // Extract the RR byte
+    g = (cod >> 8) & 0xFF;   // Extract the GG byte
+    b = (cod) & 0xFF;        // Extract the BB byte
+
     if(posix) printf("\e[38;2;%d;%d;%dm", r, g, b);
 }
 
@@ -119,13 +124,17 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
 
         // Recebe a quantidade solicitada, repete se a quantidade for inválida
         do{
-            printf("Digite a quantidade (maximo %d): ", itens[i].tipo.quantidade);
+            printf("Digite a quantidade");
+            cor_console(0xffff00);
+            printf(" (maximo %d): ", itens[i].tipo.quantidade);
+            cor_console(0xffffff);
             scanf("%d", &itens[i].qtd);
         }while(itens[i].qtd > itens[i].tipo.quantidade || itens[i].qtd < 0);
 
         // Recebe observação do item
         printf("Obs: ");
         fflush(stdin);
+        itens[i].obs[0] = '~';
         scanf("%99[^\n]s", &itens[i].obs);
         atualizar_estoque(nome, itens[i], -1);
         limpar_console();
@@ -171,12 +180,12 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
             printf("Doar troco? (s/n) ");
             fflush(stdin);
             scanf("%c", &concluir);
-            printf("Para viagem? (s/n) ");
-            fflush(stdin);
-            scanf("%c", &concluir);
         }
         if(concluir == '2'){
             printf("Aguardando senha...\n");
+            printf("Para viagem? (s/n) ");
+            fflush(stdin);
+            scanf("%c", &concluir);
         }
         limpar_console();
         printf("|Qtd.\t|Unid\t|Tot.\t|Nome\n");
@@ -213,7 +222,11 @@ void ver_pedidos(item **pedidos, int *n_pedidos){ // Imprime os pedidos da lista
         j = 0;
         printf("Pedido %d\n", i);
         while(pedidos[i][j].qtd != -1){
-            printf("  %dx %s (%s)\n", pedidos[i][j].qtd, pedidos[i][j].tipo.nome, pedidos[i][j].obs);
+            if(pedidos[i][j].obs[0] == '~'){
+                printf("  %dx %s\n", pedidos[i][j].qtd, pedidos[i][j].tipo.nome);
+            }else{
+                printf("  %dx %s (%s)\n", pedidos[i][j].qtd, pedidos[i][j].tipo.nome, pedidos[i][j].obs);
+            }
             j++;
         }
     }

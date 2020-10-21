@@ -9,7 +9,11 @@ void limpar_console(){ // Utiliza sequencia de escape para "limpar" o console (r
 }
 
 void cor_console(int cod){
-    int r = cod/0xFFFF, g = (cod%0x010000)/0xFF, b = cod % 0x0100;
+    int r, g, b;
+    r = (cod >> 16) & 0xFF;
+    g = (cod >> 8) & 0xFF;
+    b = (cod) & 0xFF;
+    
     if(posix) printf("\e[38;2;%d;%d;%dm", r, g, b);
 }
 
@@ -24,7 +28,9 @@ int ver_estoque(char *nome){ // Imprime todos os itens do estoque e retorna a qu
     int i, len;
     estoque *lista = ler_lista(nome, &len);
     if(lista == NULL){
+        cor_console(0xffff00);
         printf("Estoque sem nenhum item, utilize a opcao 3 para adicionar algo.\n");
+        cor_console(0xffffff);
         return 0;
     }
     printf("Indice\t|Codigo\t|Qtd.\t|Preco\t|Nome\n");
