@@ -24,12 +24,11 @@ void limpar_console(){ // Utiliza sequencia de escape para "limpar" o console (r
     if(posix) printf("\e[1;1H\e[2J");
 }
 
-void cor_console(int cod){
-    void cor_console(int cod){
+void cor_console(int cod){  // Utiliza sequencia de escape para mudar a cor do console (requer sistema POSIX)
     int r, g, b;
-    r = (cod >> 16) & 0xFF;  // Extract the RR byte
-    g = (cod >> 8) & 0xFF;   // Extract the GG byte
-    b = (cod) & 0xFF;        // Extract the BB byte
+    r = (cod >> 16) & 0xFF;
+    g = (cod >> 8) & 0xFF;
+    b = (cod) & 0xFF;
 
     if(posix) printf("\e[38;2;%d;%d;%dm", r, g, b);
 }
@@ -43,7 +42,7 @@ char menu(){ // Imprime as opções do menu principal no console e retorna a esc
 }
 
 void mostrar_cardapio(char *nome){ // Imprime as opções do cardápio
-    int i, len;
+    int i, len, n = 0;
     estoque *lista = ler_lista(nome, &len);
     if(lista == NULL){
         cor_console(0xff0000);
@@ -53,8 +52,15 @@ void mostrar_cardapio(char *nome){ // Imprime as opções do cardápio
     }
     printf("Codigo\t|Qtd.\t|Preco\t|Nome\n");
     for(i = 0; i < len; i++){
-        if(lista[i].quantidade > 0)
+        if(lista[i].quantidade > 0){
+            n++;
             printf("%d\t|%d\t|%.2f\t|%s\n", lista[i].codigo, lista[i].quantidade, lista[i].preco, lista[i].nome);
+        }
+    }
+    if(n == 0){
+        cor_console(0xff0000);
+        printf("Nenhum item em estoque.\n");
+        cor_console(0xffffff);
     }
 }
 
@@ -129,7 +135,7 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
             printf(" (maximo %d): ", itens[i].tipo.quantidade);
             cor_console(0xffffff);
             scanf("%d", &itens[i].qtd);
-        }while(itens[i].qtd > itens[i].tipo.quantidade || itens[i].qtd < 0);
+        }while(itens[i].qtd > itens[i].tipo.quantidade && itens[i].qtd < 0);
 
         // Recebe observação do item
         printf("Obs: ");
@@ -183,16 +189,16 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
         }
         if(concluir == '2'){
             printf("Aguardando senha...\n");
-            printf("Para viagem? (s/n) ");
-            fflush(stdin);
-            scanf("%c", &concluir);
         }
+        printf("Para viagem? (s/n) ");
+        fflush(stdin);
+        scanf("%c", &concluir);
         limpar_console();
         printf("|Qtd.\t|Unid\t|Tot.\t|Nome\n");
         i = 0;
         while(pedidos[*n_pedidos][i].qtd != -1){
             float valor;
-            if(pedidos[*n_pedidos][i].tipo.preco >= min_val_desconto && pedidos[*n_pedidos][i].qtd >= min_qtd_desconto){
+            if(pedidos[*n_pedidos][i].tipo.preco >= min_val_desconto && pedidos[*n_pedidos][i].qtd >= min_qtd_desconto){ //Printar um valor diferente se o desconto for aplicável
                 valor = pedidos[*n_pedidos][i].tipo.preco * pedidos[*n_pedidos][i].qtd * (1-desconto);
             }else{
                 valor = pedidos[*n_pedidos][i].tipo.preco * pedidos[*n_pedidos][i].qtd;
@@ -200,9 +206,22 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
             printf("|%d\t|%.2f\t|%.2f\t|%s\n", pedidos[*n_pedidos][i].qtd, pedidos[*n_pedidos][i].tipo.preco, valor, pedidos[*n_pedidos][i].tipo.nome);
             i++;
         }
+        i = 0;
+        while(pedidos[*n_pedidos][i].qtd != -1){ // Listar descontos
+            if(pedidos[*n_pedidos][i].tipo.preco >= min_val_desconto && pedidos[*n_pedidos][i].qtd >= min_qtd_desconto){
+                printf("%d\n", i);
+                cor_console(0x00ff00);
+                printf("Desconto de %.0f%% aplicado em %s\n", desconto*100, pedidos[*n_pedidos][i].tipo.nome);
+                cor_console(0xffffff);
+            }
+            i++;
+        }
         printf("Valor total: RS%.2f\n", valor_total);
+        cor_console(0xffff00);
         printf("Senha do pedido: %d\n", *n_pedidos);
+        cor_console(0x00ff00);
         printf("Pedido finalizado!\n");
+        cor_console(0xffffff);
         (*n_pedidos) += 1;
     }else{
         for(j = 0; j < i; j++){
@@ -214,7 +233,9 @@ void novo_pedido(char *nome, item **pedidos, int *n_pedidos){ // Procedimento in
 
 void ver_pedidos(item **pedidos, int *n_pedidos){ // Imprime os pedidos da lista
     if(*n_pedidos == 0){
+        cor_console(0xffff00);
         printf("Nenhum pedido em aberto.\n");
+        cor_console(0xffffff);
         return;
     }
     int i, j;
@@ -256,6 +277,8 @@ const char help[] = "Opcoes:\n\t-a <arquivo> : Utilizar arquivo de estoque\n\t-p
 int main(int argc, char **argv){ // Controla o fluxo principal do programa
     char *nome = "estoque.bin";
     int novo_nome = 0;
+    
+    // Parser dos argumentos da linha de comando
     if(argc != 1){
         int i;
         for(i = 1; i < argc; i++){

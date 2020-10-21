@@ -8,7 +8,7 @@ void limpar_console(){ // Utiliza sequencia de escape para "limpar" o console (r
     if(posix) printf("\e[1;1H\e[2J");
 }
 
-void cor_console(int cod){
+void cor_console(int cod){  // Utiliza sequencia de escape para mudar a cor do console (requer sistema POSIX)
     int r, g, b;
     r = (cod >> 16) & 0xFF;
     g = (cod >> 8) & 0xFF;
@@ -92,6 +92,8 @@ const char help[] = "Opcoes:\n\t-a <arquivo> : Utilizar arquivo de estoque\n\t-p
 int main(int argc, char **argv){ // Controla o fluxo principal do programa
     char *nome = "estoque.bin";
     int novo_nome = 0;
+
+    // Parser dos argumentos da linha de comando
     if(argc != 1){
         int i;
         for(i = 1; i < argc; i++){
